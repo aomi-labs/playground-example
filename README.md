@@ -39,7 +39,9 @@ promotes it.
 
 ```
 playground-example/
-├── aomi.toml      # app slug, display name, platform = "community", visibility
+├── .aomi/
+│   └── config.json # project platform and application manifests
+├── aomi.toml      # app slug, display name, visibility
 ├── Cargo.toml     # cdylib + aomi-sdk pinned to the platform's required SDK version
 ├── src/lib.rs     # your tools + the dyn_aomi_app! registration
 └── .gitignore
@@ -47,7 +49,7 @@ playground-example/
 
 ## Rules CI enforces
 
-- `platform = "community"` in `aomi.toml`.
+- `.aomi/config.json` declares platform `community` and lists `aomi.toml`.
 - `aomi-sdk` pinned EXACTLY (`= x.y.z`) to the community platform's
   `required_sdk_version` (see `platform.json` in `aomi-labs/community-apps`).
 - `crate-type = ["cdylib"]`.
