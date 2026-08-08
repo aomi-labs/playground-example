@@ -50,8 +50,8 @@ playground-example/
 ## Rules CI enforces
 
 - `.aomi/config.json` declares platform `community` and lists `aomi.toml`.
-- `aomi-sdk` pinned EXACTLY (`= x.y.z`) to the community platform's
-  `required_sdk_version` (see `platform.json` in `aomi-labs/community-apps`).
+- `aomi-sdk` pinned EXACTLY (`= x.y.z`) to the backend runtime version returned
+  by `/api/platforms/server-tags`.
 - `crate-type = ["cdylib"]`.
 
 You do **not** hand-edit the platform repo — everything goes through
