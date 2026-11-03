@@ -154,6 +154,9 @@ pnpm install
 pnpm --filter web dev             # open http://localhost:5173
 ```
 
+A guest chat lives only in the open page. Reloading the page starts a new,
+empty chat, and the earlier guest thread is not restored.
+
 One prompt from Node:
 
 ```sh
