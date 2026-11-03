@@ -88,6 +88,10 @@ fn order_total_rejects_bad_input() {
             Err("qty must be 1–20".into())
         );
     }
+    let split = json!({ "items": [
+        { "id": "C-02", "qty": 20 }, { "id": "C-02", "qty": 20 }, { "id": "C-02", "qty": 10 }
+    ] });
+    assert_eq!(call::<OrderTotal>(split), Err("qty must be 1–20".into()));
 }
 
 #[test]

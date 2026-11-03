@@ -1,5 +1,7 @@
 //! The Space Café skill: `menu_search` and `order_total` over a fixed menu.
 
+use std::collections::HashMap;
+
 use aomi_sdk::{DynAomiTool, DynToolCallCtx};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -71,7 +73,7 @@ impl DynAomiTool for MenuSearch {
 pub struct OrderLine {
     /// Menu item id exactly as returned by menu_search, e.g. "C-01".
     id: String,
-    /// Quantity, 1 to 20.
+    /// Quantity, 1 to 20 per item. Lines with the same id count together.
     qty: u32,
 }
 
@@ -95,12 +97,17 @@ impl DynAomiTool for OrderTotal {
         let menu = menu();
         let mut total_cents = 0;
         let mut lines = Vec::with_capacity(args.items.len());
+        let mut qty_by_id = HashMap::new();
         for line in args.items {
             let item = menu
                 .iter()
                 .find(|item| item.id == line.id)
                 .ok_or_else(|| format!("unknown_id: {}", line.id))?;
-            if !(1..=20).contains(&line.qty) {
+            // Lines with the same id count together, so an order can't dodge the
+            // limit by splitting one item across several lines.
+            let ordered = qty_by_id.entry(item.id.as_str()).or_insert(0);
+            *ordered += line.qty;
+            if line.qty == 0 || *ordered > 20 {
                 return Err("qty must be 1–20".into());
             }
             let subtotal_cents = item.price_cents * line.qty;
