@@ -20,21 +20,27 @@ flowchart TB
     direction LR
     try["6 · Try it<br/><small><i>web/ page · client ask</i></small>"] --> tour["7 · Run tour<br/><small><i>client/src/tour.ts</i></small>"] --> product["8 · Add to your product<br/><small><i>main.tsx or turn.ts</i></small>"] --> prod["9 · Go to production<br/><small><i>aomi.toml server_tags</i></small>"]
   end
+  subgraph legend["Color key"]
+    direction LR
+    kApp["Your app code<br/><small><i>src/, tests/, aomi.toml</i></small>"]
+    kAomi["Aomi Build and CLI<br/><small><i>runs on Aomi</i></small>"]
+    kCall["Your callers<br/><small><i>web/, client/</i></small>"]
+    kApp ~~~ kAomi ~~~ kCall
+  end
   build --> ship --> use
+  use ~~~ legend
 
   classDef app fill:#FAEEDA,stroke:#854F0B,color:#412402
   classDef callers fill:#FBEAF0,stroke:#993556,color:#4B1528
   classDef aomi fill:#E1F5EE,stroke:#0F6E56,color:#04342C
-  class copy,edit,test app
-  class try,tour,product callers
-  class deploy,appid,prod aomi
+  class copy,edit,test,kApp app
+  class try,tour,product,kCall callers
+  class deploy,appid,prod,kAomi aomi
   style build fill:#ffffff,stroke:#B4B2A9
   style ship fill:#ffffff,stroke:#B4B2A9
   style use fill:#ffffff,stroke:#B4B2A9
+  style legend fill:#ffffff,stroke:#D3D1C7,stroke-dasharray:4 4
 ```
-
-Colors show what each step touches. Amber is the app code in `src/`. Pink is
-the callers in `web/` and `client/`. Teal is Aomi Build and the CLI.
 
 | Step | What you do | Where |
 | --- | --- | --- |
