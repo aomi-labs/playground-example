@@ -27,7 +27,9 @@ cargo test
 
 ## Deploy
 
-Pick one of the two paths below. Both end with a Project that deploys this repo.
+Pick one of the two paths below. Both end with a Project that deploys your own
+copy of this repo. Start from Build or from a copy. Never connect this template
+repo itself as a Project.
 
 ### Build
 
