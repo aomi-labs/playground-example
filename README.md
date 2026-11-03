@@ -136,9 +136,9 @@ curl -s "https://chat-staging.aomi.dev/api/public/catalog/apps?platform=communit
   | jq '.[] | select(.app_release_tag == "<your release tag>")'
 ```
 
-Use `https://chat.aomi.dev` for production. Every deploy prints a new release
-tag, so look the id up again after you redeploy. The lookup only works while
-`public = true` in `aomi.toml`.
+Use `https://chat.aomi.dev` for production. A redeploy keeps the same
+application id, and the catalog row moves to the new release tag. The lookup
+only works while `public = true` in `aomi.toml`.
 
 ### 6. Try it
 
