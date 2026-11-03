@@ -7,29 +7,34 @@ and the architecture come after it.
 ## Your journey
 
 ```mermaid
-flowchart TD
-  start([You want to build on Aomi]) --> copy
-  copy["1 · Get your own copy<br/><i>Build: Start from the template<br/>or GitHub: Use this template</i>"] --> edit
-  edit["2 · Make it yours<br/><i>src/ tools and skill · aomi.toml name</i>"] --> test
-  test["3 · Test locally<br/><i>cargo test · pnpm -r typecheck</i>"] --> deploy
-  deploy["4 · Deploy<br/><i>Build button, or aomi-build deploy</i>"] --> appid
-  appid["5 · Get the application id<br/><i>catalog lookup by release tag</i>"] --> try
-  try["6 · Try it<br/><i>web/ widget page · client ask</i>"] --> check
-  check["7 · Check the whole deploy<br/><i>client tour</i>"] --> ship
-  ship["8 · Put it in your product<br/><i>copy web/src/main.tsx or client/src/turn.ts</i>"] --> prod
-  prod(["9 · Go to production<br/><i>server_tags = prod</i>"])
-  check -. change something .-> edit
+flowchart TB
+  subgraph build["Build it · src/"]
+    direction LR
+    copy["1 · Copy the template"] --> edit["2 · Edit tools and skill"] --> test["3 · cargo test"]
+  end
+  subgraph ship["Ship it · Build or CLI"]
+    direction LR
+    deploy["4 · Deploy"] --> appid["5 · Get the app id"]
+  end
+  subgraph use["Use it · web/ and client/"]
+    direction LR
+    try["6 · Try it"] --> tour["7 · Run tour"] --> product["8 · Add to your product"] --> prod["9 · Go to production"]
+  end
+  build --> ship --> use
 
   classDef app fill:#FAEEDA,stroke:#854F0B,color:#412402
   classDef callers fill:#FBEAF0,stroke:#993556,color:#4B1528
   classDef aomi fill:#E1F5EE,stroke:#0F6E56,color:#04342C
-  class edit,test app
-  class try,check,ship callers
-  class copy,deploy,appid,prod aomi
+  class copy,edit,test app
+  class try,tour,product callers
+  class deploy,appid,prod aomi
+  style build fill:#ffffff,stroke:#B4B2A9
+  style ship fill:#ffffff,stroke:#B4B2A9
+  style use fill:#ffffff,stroke:#B4B2A9
 ```
 
-Colors show what each step touches: amber is the app code in `src/`, pink is the
-callers in `web/` and `client/`, teal is Aomi Build and the CLI.
+Colors show what each step touches. Amber is the app code in `src/`. Pink is
+the callers in `web/` and `client/`. Teal is Aomi Build and the CLI.
 
 | Step | What you do | Where |
 | --- | --- | --- |
