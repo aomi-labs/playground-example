@@ -6,24 +6,38 @@ and the architecture come after it.
 
 ## Your journey
 
+| Step | What you do | Where |
+| --- | --- | --- |
+| 1 | Get your own copy. Never connect this template repo itself as a Project. | [Get your copy](#1-get-your-own-copy) |
+| 2 | Rename the app and change the tools. | [The app](#the-app-src) |
+| 3 | Run the tests. | [Test locally](#3-test-locally) |
+| 4 | Deploy from Build or the CLI. | [Deploy](#4-deploy) |
+| 5 | Look up the application id. | [Application id](#5-get-the-application-id) |
+| 6 | Chat with your app from the widget page or one `ask` call. | [Try it](#6-try-it) |
+| 7 | Run `tour`, which checks every tool on the deployed app. | [Check the deploy](#7-check-the-whole-deploy) |
+| 8 | Copy one caller file into your product. | [Put it in your product](#8-put-it-in-your-product) |
+| 9 | Allow production servers to load your release. | [Go to production](#9-go-to-production) |
+
+After step 7, you loop: change a tool, bump `BUILD`, deploy, run `tour` again.
+
 ```mermaid
 %%{init: {"flowchart": {"nodeSpacing": 28, "rankSpacing": 22}}}%%
 flowchart TB
   subgraph build["Build it · src/"]
     direction LR
-    copy["1 · Copy the template<br/><small><i>Build or GitHub template</i></small>"] --> edit["2 · Edit tools and skill<br/><small><i>src/*.rs · aomi.toml</i></small>"] --> test["3 · cargo test<br/><small><i>tests/tools.rs</i></small>"]
+    copy["1 · Copy the template<br/><i>Build or GitHub template</i>"] --> edit["2 · Edit tools and skill<br/><i>src/*.rs · aomi.toml</i>"] --> test["3 · cargo test<br/><i>tests/tools.rs</i>"]
   end
   subgraph ship["Ship it · Build or CLI"]
     direction LR
-    deploy["4 · Deploy<br/><small><i>aomi-build deploy · Build</i></small>"] --> appid["5 · Get the app id<br/><small><i>public catalog, by release tag</i></small>"]
+    deploy["4 · Deploy<br/><i>aomi-build deploy · Build</i>"] --> appid["5 · Get the app id<br/><i>public catalog, by release tag</i>"]
   end
   subgraph use["Use it · web/ and client/"]
     direction LR
-    try["6 · Try it<br/><small><i>web/ page · client ask</i></small>"] --> tour["7 · Run tour<br/><small><i>client/src/tour.ts</i></small>"] --> product["8 · Add to your product<br/><small><i>main.tsx or turn.ts</i></small>"] --> prod["9 · Go to production<br/><small><i>aomi.toml server_tags</i></small>"]
+    try["6 · Try it<br/><i>web/ page · client ask</i>"] --> tour["7 · Run tour<br/><i>client/src/tour.ts</i>"] --> product["8 · Add to your product<br/><i>main.tsx or turn.ts</i>"] --> prod["9 · Go to production<br/><i>aomi.toml server_tags</i>"]
   end
   subgraph legend["Color key"]
     direction LR
-    dApp((" ")) ~~~ kApp["Your app code<br/><small><i>src/, tests/, aomi.toml</i></small>"] ~~~ dAomi((" ")) ~~~ kAomi["Aomi Build and CLI<br/><small><i>runs on Aomi</i></small>"] ~~~ dCall((" ")) ~~~ kCall["Your callers<br/><small><i>web/, client/</i></small>"]
+    dApp((" ")) ~~~ kApp["Your app code<br/><i>src/, tests/, aomi.toml</i>"] ~~~ dAomi((" ")) ~~~ kAomi["Aomi Build and CLI<br/><i>runs on Aomi</i>"] ~~~ dCall((" ")) ~~~ kCall["Your callers<br/><i>web/, client/</i>"]
   end
   build --> ship --> use
   use ~~~ legend
@@ -47,20 +61,6 @@ flowchart TB
   class dAomi dotAomi
   class dCall dotCall
 ```
-
-| Step | What you do | Where |
-| --- | --- | --- |
-| 1 | Get your own copy. Never connect this template repo itself as a Project. | [Get your copy](#1-get-your-own-copy) |
-| 2 | Rename the app and change the tools. | [The app](#the-app-src) |
-| 3 | Run the tests. | [Test locally](#3-test-locally) |
-| 4 | Deploy from Build or the CLI. | [Deploy](#4-deploy) |
-| 5 | Look up the application id. | [Application id](#5-get-the-application-id) |
-| 6 | Chat with your app from the widget page or one `ask` call. | [Try it](#6-try-it) |
-| 7 | Run `tour`, which checks every tool on the deployed app. | [Check the deploy](#7-check-the-whole-deploy) |
-| 8 | Copy one caller file into your product. | [Put it in your product](#8-put-it-in-your-product) |
-| 9 | Allow production servers to load your release. | [Go to production](#9-go-to-production) |
-
-After step 7, you loop: change a tool, bump `BUILD`, deploy, run `tour` again.
 
 ## The steps
 
