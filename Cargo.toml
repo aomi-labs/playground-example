@@ -1,21 +1,22 @@
 [package]
 name    = "playground-example"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 publish = false
 
-# Aomi plugins are dynamically loaded by the backend — they MUST be a cdylib.
+# Aomi apps are dynamically loaded by the backend, so they MUST be a cdylib.
+# The rlib lets tests/tools.rs link against the crate; the backend only loads the cdylib.
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 # Pin EXACTLY to the backend runtime version. The deploy preflight rejects any
 # mismatch, including patch releases.
-aomi-sdk   = "=5.1.1"
+aomi-sdk   = "=6.0.0"
 schemars   = "1"
 serde      = { version = "1", features = ["derive"] }
 serde_json = "1"
 
-# Tools run inside a synchronous FFI boundary — there is no async runtime inside
-# the plugin. When you need HTTP, use reqwest's blocking client:
+# Tools run inside a synchronous FFI boundary, so there is no async runtime inside
+# the app. When you need HTTP, use reqwest's blocking client:
 # reqwest = { version = "0.12", features = ["blocking", "json", "rustls-tls"], default-features = false }

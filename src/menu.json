@@ -1,0 +1,8 @@
+[
+  { "id": "C-01", "name": "Nebula Latte",       "price_cents": 450, "tags": ["coffee", "hot"] },
+  { "id": "C-02", "name": "Comet Croissant",    "price_cents": 320, "tags": ["pastry", "baked"] },
+  { "id": "C-03", "name": "Moon Mochi",         "price_cents": 280, "tags": ["sweet", "chewy"] },
+  { "id": "C-04", "name": "Solar Lemonade",     "price_cents": 390, "tags": ["cold", "citrus"] },
+  { "id": "C-05", "name": "Asteroid Cookie",    "price_cents": 150, "tags": ["sweet", "baked"] },
+  { "id": "C-06", "name": "Black Hole Brownie", "price_cents": 360, "tags": ["sweet", "chocolate"] }
+]

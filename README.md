@@ -1,58 +1,101 @@
-# Aomi Playground Example
+# Aomi app template
 
-This is the starter app behind Aomi's "deploy an example" onboarding. If you got
-here from the Aomi portal, **you already have this agent deployed** — this repo
-is its source. Clone it, change a tool, and redeploy to make it your own.
+A small Aomi app you can deploy as is, then edit. The Rust app is at the repo
+root. `web/` and `client/` are two ways to talk to it once it is deployed.
 
-## What it does
+## What's inside
 
-Two tiny tools that show the shape of an Aomi app:
+- `src/` holds the app `playground-example`, build `v1`. It is built with `aomi-sdk =6.0.0`.
+  - `greet` and `about` are always available to the model.
+  - `menu_search` and `order_total` belong to the `playground-example/cafe` skill
+    in `src/skill/cafe.md`. The model sees them only after it activates the skill.
+- `tests/tools.rs` tests every tool. It also checks the manifest and which skill owns each tool.
+- `web/` is a Vite + React page with `<AomiWidget>` in direct mode.
+- `client/` has Node scripts that use `@aomi-labs/client`. `pnpm --filter client tour` runs a scripted conversation.
+- `.aomi/config.json` and `aomi.toml` are what Build reads to deploy.
 
-| Tool | Args | Returns |
-|---|---|---|
-| `echo` | `message: string` | the same message |
-| `greet` | `name: string`, `excited?: bool` | a greeting |
+The Rust build never touches the JS workspace.
 
-## Make it yours
+Keep the `aomi-sdk = "=6.0.0"` pin in `Cargo.toml`. It must match the backend
+runtime exactly. The deploy preflight rejects any other version.
 
-```bash
-# 1. You created this repo from the template (the onboarding flow did this for you).
-git clone https://github.com/<you>/playground-example
-cd playground-example
+## Test locally
 
-# 2. Edit a tool, or add your own — copy the GreetTool pattern in src/lib.rs.
-$EDITOR src/lib.rs
+```sh
+cargo test
+```
 
-# 3. Compile-check locally.
-cargo check
+## Deploy
 
-# 4. Redeploy. aomi-build sends a source-bound deploy to the Aomi backend, which
-#    stages it, builds a release, and (after activation) loads your new version
-#    into your chat session.
+Pick one of the two paths below. Both end with a Project that deploys this repo.
+
+### Build
+
+Open Aomi Build at [build.aomi.dev](https://build.aomi.dev). Choose "Start from
+the template", or import a repo you made with "Use this template" on GitHub.
+Build creates the Project, so you can skip `aomi-build project create`.
+
+### CLI
+
+Create your own repo from this one with "Use this template" on GitHub, then
+clone it. Install the CLI. Version 6.0.2 or later is required.
+
+```sh
+cargo install aomi-sdk --version 6.0.2 --features cli --locked
+```
+
+Run these from your clone:
+
+```sh
+aomi-build login --backend https://api.aomi.dev
+aomi-build project create
 aomi-build deploy
 ```
 
-Each redeploy from a new commit creates a fresh candidate build; activation
-promotes it.
+`aomi-build login` opens GitHub in your browser to sign you in. It saves the
+backend URL, so later commands reuse it.
 
-## Layout
+`aomi-build project create` prints a GitHub authorization page for your repo.
+Approve it within 10 minutes as a GitHub user with admin on the repo. The
+Project is created when you approve. The command reads the repo from your
+`origin` remote.
 
+Useful flags for `project create`:
+
+- `--repo owner/name` names the repo. It must match your `origin` remote.
+- `--platform <name>` picks the platform. The default is `community`.
+- `--build-url <url>` sets the Aomi Build URL. It is inferred from the backend.
+- `--no-browser` prints the URL instead of opening a browser.
+
+### Staging
+
+Use the staging hosts for every step:
+
+- Build: [build-staging.aomi.dev](https://build-staging.aomi.dev)
+- CLI: `aomi-build login --backend https://api-staging.aomi.dev`
+- Chat: `https://chat-staging.aomi.dev`, set through the env vars below
+
+Deploying gives you an application id. Put it in the env files below.
+
+## Widget
+
+```sh
+cp web/.env.example web/.env      # set VITE_AOMI_APPLICATION_ID
+pnpm install
+pnpm --filter web dev
 ```
-playground-example/
-├── .aomi/
-│   └── config.json # project platform and application manifests
-├── aomi.toml      # app slug, display name, visibility
-├── Cargo.toml     # cdylib + aomi-sdk pinned to the platform's required SDK version
-├── src/lib.rs     # your tools + the dyn_aomi_app! registration
-└── .gitignore
+
+The widget uses direct routing. Every message goes to this app.
+
+## Client
+
+```sh
+cp client/.env.example client/.env      # set AOMI_APPLICATION_ID
+pnpm install
+pnpm --filter client tour               # the scripted conversation
+pnpm --filter client ask "Greet Ada, excitedly"
 ```
 
-## Rules CI enforces
-
-- `.aomi/config.json` declares platform `community` and lists `aomi.toml`.
-- `aomi-sdk` pinned EXACTLY (`= x.y.z`) to the backend runtime version returned
-  by `/api/platforms/server-tags`.
-- `crate-type = ["cdylib"]`.
-
-You do **not** hand-edit the platform repo — everything goes through
-`aomi-build deploy`.
+Both print the host they talk to when they start. They use the production chat
+host by default. For staging, set `VITE_AOMI_BASE_URL` in `web/.env` or
+`AOMI_BASE_URL` in `client/.env` to `https://chat-staging.aomi.dev`.
