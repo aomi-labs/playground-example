@@ -1,69 +1,71 @@
 # Aomi app template
 
-This repo is a small Aomi app you can deploy as is, then edit. It has two
-halves:
+You came to Aomi to build an app. This repo is a working app you can deploy in a
+few minutes, then turn into your own. Start with the journey below. The code
+and the architecture come after it.
 
-- **The app** is the Rust code at the repo root. Aomi builds it and runs it on
-  its servers. The model calls its tools.
-- **The callers** are `web/` and `client/`. They run on your machine and talk to
-  the deployed app over the network, by its application id.
-
-The callers are examples. You don't need them to use your app. They show the
-code you would write in your own product to reach it.
+## Your journey
 
 ```mermaid
-flowchart LR
-  subgraph repo[Your copy of this repo]
-    app[src/ app]
-    web[web/ widget page]
-    client[client/ Node scripts]
-  end
-  app -- aomi-build deploy --> aomi[Aomi servers<br/>run the app]
-  web -- chat, by application id --> aomi
-  client -- chat, by application id --> aomi
+flowchart TD
+  start([You want to build on Aomi]) --> copy
+  copy["1 · Get your own copy<br/><i>Build: Start from the template<br/>or GitHub: Use this template</i>"] --> edit
+  edit["2 · Make it yours<br/><i>src/ tools and skill · aomi.toml name</i>"] --> test
+  test["3 · Test locally<br/><i>cargo test · pnpm -r typecheck</i>"] --> deploy
+  deploy["4 · Deploy<br/><i>Build button, or aomi-build deploy</i>"] --> appid
+  appid["5 · Get the application id<br/><i>catalog lookup by release tag</i>"] --> try
+  try["6 · Try it<br/><i>web/ widget page · client ask</i>"] --> check
+  check["7 · Check the whole deploy<br/><i>client tour</i>"] --> ship
+  ship["8 · Put it in your product<br/><i>copy web/src/main.tsx or client/src/turn.ts</i>"] --> prod
+  prod(["9 · Go to production<br/><i>server_tags = prod</i>"])
+  check -. change something .-> edit
+
+  classDef app fill:#FAEEDA,stroke:#854F0B,color:#412402
+  classDef callers fill:#FBEAF0,stroke:#993556,color:#4B1528
+  classDef aomi fill:#E1F5EE,stroke:#0F6E56,color:#04342C
+  class edit,test app
+  class try,check,ship callers
+  class copy,deploy,appid,prod aomi
 ```
 
-## How to use this repo
+Colors show what each step touches: amber is the app code in `src/`, pink is the
+callers in `web/` and `client/`, teal is Aomi Build and the CLI.
 
-1. Make your own copy. Use "Start from the template" in Aomi Build, or "Use this
-   template" on GitHub. Never connect this template repo itself as a Project.
-2. Test the app locally with `cargo test`.
-3. Deploy it. You get a running app with an application id.
-4. Talk to it from the widget page or the Node client.
-5. Change the tools, bump `BUILD` in `src/lib.rs`, and deploy again.
-
-Each step has a section below.
-
-## What's in the repo
-
-| Path | What it is | When you touch it |
+| Step | What you do | Where |
 | --- | --- | --- |
-| `src/lib.rs` | App entry. Declares the name, the preamble, the tools and the skill. | To add a tool or change what the model is told |
-| `src/tools.rs` | `greet` and `about`. The model always sees these. | To change or add always-on tools |
-| `src/cafe.rs`, `src/menu.json` | `menu_search` and `order_total`, plus their data. | As a model for your own skill tools |
-| `src/skill/cafe.md` | Instructions for the `playground-example/cafe` skill. | To change how the model uses the skill |
-| `tests/tools.rs` | Tests every tool, the manifest, and which skill owns each tool. | Whenever you change a tool |
-| `aomi.toml` | App name, display name, catalog visibility, server tags. | When you rename the app or go to production |
-| `.aomi/config.json` | Tells Build which `aomi.toml` files to deploy. | Rarely |
-| `web/` | A Vite and React page with `<AomiWidget>` in direct mode. | To see your app in a chat UI |
-| `client/` | Node scripts that use the published `@aomi-labs/client`. | To call your app from code |
+| 1 | Get your own copy. Never connect this template repo itself as a Project. | [Get your copy](#1-get-your-own-copy) |
+| 2 | Rename the app and change the tools. | [The app](#the-app-src) |
+| 3 | Run the tests. | [Test locally](#3-test-locally) |
+| 4 | Deploy from Build or the CLI. | [Deploy](#4-deploy) |
+| 5 | Look up the application id. | [Application id](#5-get-the-application-id) |
+| 6 | Chat with your app from the widget page or one `ask` call. | [Try it](#6-try-it) |
+| 7 | Run `tour`, which checks every tool on the deployed app. | [Check the deploy](#7-check-the-whole-deploy) |
+| 8 | Copy one caller file into your product. | [Put it in your product](#8-put-it-in-your-product) |
+| 9 | Allow production servers to load your release. | [Go to production](#9-go-to-production) |
 
-### The app
+After step 7, you loop: change a tool, bump `BUILD`, deploy, run `tour` again.
 
-`greet` and `about` are always available to the model. `menu_search` and
-`order_total` belong to the `playground-example/cafe` skill. The model sees them
-only after it activates the skill.
+## The steps
 
-`about` reports the `BUILD` constant from `src/lib.rs`. Bump it when you ship a
-change, so you can tell which build answered.
+### 1. Get your own copy
 
-Keep the `aomi-sdk = "=6.0.0"` pin in `Cargo.toml`. It must match the backend
-runtime exactly. The deploy preflight rejects any other version.
+Pick one:
 
-To rename the app, change `name` in `dyn_aomi_app!` in `src/lib.rs` and `name`
-in `aomi.toml`. The two must match.
+- **Build.** Open [build.aomi.dev](https://build.aomi.dev) and choose "Start
+  from the template". Build creates your repo and the Project for you.
+- **GitHub.** Click "Use this template" on this repo and clone your copy. You
+  create the Project in step 4.
 
-## Test locally
+### 2. Make it yours
+
+Rename the app in two places. They must match:
+
+- `name` in `dyn_aomi_app!` in `src/lib.rs`
+- `name` in `aomi.toml`
+
+Then change the tools. [The app](#the-app-src) section explains each file.
+
+### 3. Test locally
 
 ```sh
 cargo test --locked
@@ -71,31 +73,22 @@ pnpm install
 pnpm -r typecheck
 ```
 
-The Rust build never touches the JS workspace. CI runs the same checks in
-`.github/workflows/check.yml`.
+CI runs the same checks in `.github/workflows/check.yml`. A local run with
+`aomi-run` shows the model every tool at once. Skill gating only happens on
+Aomi's servers, so test skills after you deploy.
 
-A local run with `aomi-run` shows the model every tool from the start. Skill
-gating only happens on Aomi's servers, so test the café skill after you deploy.
+### 4. Deploy
 
-## Deploy
+**From Build:** press Deploy on your Project.
 
-Both paths end with a Project that deploys your copy of this repo.
-
-### From Build
-
-Open Aomi Build at [build.aomi.dev](https://build.aomi.dev). Choose "Start from
-the template", or import a repo you made with "Use this template" on GitHub.
-Build creates the Project, so you can skip `aomi-build project create`.
-
-### From the CLI
-
-Install the CLI. Version 6.0.2 or later is required.
+**From the CLI:** install it once. Version 6.0.2 or later is required.
 
 ```sh
 cargo install aomi-sdk --version 6.0.2 --features cli --locked
 ```
 
-Run these from your clone:
+Run these from your clone. Skip `project create` if Build already made the
+Project.
 
 ```sh
 aomi-build login --backend https://api.aomi.dev
@@ -103,90 +96,61 @@ aomi-build project create
 aomi-build deploy
 ```
 
-- `aomi-build login` opens GitHub in your browser to sign you in. It saves the
-  backend URL, so later commands reuse it.
-- `aomi-build project create` prints a GitHub authorization page for your repo.
-  Approve it within 10 minutes as a GitHub user with admin on the repo. The
-  Project is created when you approve. The command reads the repo from your
-  `origin` remote.
-- `aomi-build deploy` checks that your tree is clean and pushed and that the SDK
-  pin matches. Then it builds, activates and checks the app. It ends by
-  printing the release tag.
+- `login` opens GitHub in your browser to sign you in. It saves the backend
+  URL, so later commands reuse it.
+- `project create` prints a GitHub authorization page for your repo. Approve it
+  within 10 minutes as a GitHub user with admin on the repo. The Project is
+  created when you approve. Flags: `--repo owner/name`, `--platform <name>`
+  (default `community`), `--build-url <url>`, `--no-browser`.
+- `deploy` checks that your tree is clean and pushed and that the SDK pin
+  matches. Then it builds, activates and checks the app, and prints the
+  release tag.
 
-Useful flags for `project create`:
+For staging, use [build-staging.aomi.dev](https://build-staging.aomi.dev) and
+`--backend https://api-staging.aomi.dev`.
 
-- `--repo owner/name` names the repo. It must match your `origin` remote.
-- `--platform <name>` picks the platform. The default is `community`.
-- `--build-url <url>` sets the Aomi Build URL. It is inferred from the backend.
-- `--no-browser` prints the URL instead of opening a browser.
+### 5. Get the application id
 
-### Staging
-
-Use the staging hosts for every step:
-
-- Build: [build-staging.aomi.dev](https://build-staging.aomi.dev)
-- CLI: `aomi-build login --backend https://api-staging.aomi.dev`
-- Chat: `https://chat-staging.aomi.dev`, set through the env files below
-
-`aomi.toml` leaves `server_tags` unset, which means only staging servers load
-your release. Set `server_tags = ["prod"]` once you have tested it on staging.
-
-### Find your application id
-
-The widget and the client need the application id. The CLI does not print it
-yet. Look it up in the public catalog by the release tag that `aomi-build
-deploy` printed:
+The callers reach your app by its application id. The CLI does not print it
+yet. Look it up in the public catalog with the release tag from step 4:
 
 ```sh
 curl -s "https://chat-staging.aomi.dev/api/public/catalog/apps?platform=community" \
   | jq '.[] | select(.app_release_tag == "<your release tag>")'
 ```
 
-Use `https://chat.aomi.dev` for production.
+Use `https://chat.aomi.dev` for production. Every deploy prints a new release
+tag, so look the id up again after you redeploy. The lookup only works while
+`public = true` in `aomi.toml`.
 
-Every deploy prints a new release tag. Look the id up again after you redeploy.
-This lookup only works while `public = true` in `aomi.toml`.
+### 6. Try it
 
-## Talk to your app
+Both callers use the production chat host by default and print the host when
+they start. For staging, set the base URL line in the `.env` file to
+`https://chat-staging.aomi.dev`.
 
-Both callers send every message straight to your app in direct mode. Without
-direct mode, the Auto agent answers instead of your app.
-
-Both use the production chat host by default and print the host they use when
-they start. For staging, set `VITE_AOMI_BASE_URL` in `web/.env` or
-`AOMI_BASE_URL` in `client/.env` to `https://chat-staging.aomi.dev`.
-
-### Widget page
+Widget page:
 
 ```sh
 cp web/.env.example web/.env      # set VITE_AOMI_APPLICATION_ID
 pnpm install
-pnpm --filter web dev
+pnpm --filter web dev             # open http://localhost:5173
 ```
 
-Open http://localhost:5173. The page in `web/src/main.tsx` is the code to copy
-into your own site.
-
-### Node client
+One prompt from Node:
 
 ```sh
 cp client/.env.example client/.env      # set AOMI_APPLICATION_ID
-pnpm install
 pnpm --filter client ask "Greet Ada, excitedly"
+```
+
+### 7. Check the whole deploy
+
+```sh
 pnpm --filter client tour
 ```
 
-The client is example code on top of the published `@aomi-labs/client`
-package. It has three files:
-
-- `client/src/turn.ts` is the part to copy into your own code. It creates the
-  client, sends a prompt in direct mode to your application id, and prints the
-  tools that ran (`tool_complete` events) and the reply.
-- `client/src/run.ts` is `ask`. It sends one prompt and exits.
-- `client/src/tour.ts` is `tour`. It runs a fixed conversation that checks your
-  deploy end to end.
-
-`tour` runs three sessions. Each one checks something you can only see on a
+`tour` runs three sessions. Each checks something you can only see on a
 deployed app:
 
 | Session | Prompts | What it shows |
@@ -195,8 +159,108 @@ deployed app:
 | 2 | "Greet Bob" | A new session starts with the skill off. Only `greet` runs. |
 | 3 | "Order 50 Comet Croissants", "add item C-99" | Tool errors come back as plain messages, and the next turn still works. |
 
-Run `tour` after every deploy. If a session doesn't show the tools in the
-table, the deploy isn't working as expected.
+When you change the tools, change the prompts in `client/src/tour.ts` to match.
+
+### 8. Put it in your product
+
+Copy the caller that fits your product:
+
+- A website: `web/src/main.tsx`. It renders `<AomiWidget>` in direct mode for
+  your application id.
+- A backend or script: `client/src/turn.ts`. It sends a prompt in direct mode
+  and reads the tools that ran and the reply.
+
+Keep direct mode. It sends every message to your app. Without it, the Auto
+agent answers.
+
+### 9. Go to production
+
+`aomi.toml` leaves `server_tags` unset, which means only staging servers load
+your release. Set `server_tags = ["prod"]` once your app works on staging, then
+deploy against `https://api.aomi.dev`.
+
+## Architecture
+
+Your repo holds two kinds of code. The app runs on Aomi. The callers run
+wherever you put them and reach the app over the network.
+
+```mermaid
+flowchart LR
+  subgraph repo[Your repo]
+    app[src/ app]
+    web[web/ widget page]
+    client[client/ Node scripts]
+  end
+  subgraph aomi[Aomi]
+    build["Build + CLI<br/>deploy"]
+    ci["Release build<br/>community-apps CI"]
+    chat[Chat host]
+    runtime["Backend runtime<br/>loads your release"]
+  end
+  app --> build --> ci --> runtime
+  web -- direct mode, app id --> chat
+  client -- direct mode, app id --> chat
+  chat --> runtime
+
+  classDef app fill:#FAEEDA,stroke:#854F0B,color:#412402
+  classDef callers fill:#FBEAF0,stroke:#993556,color:#4B1528
+  classDef aomi fill:#E1F5EE,stroke:#0F6E56,color:#04342C
+  class app app
+  class web,client callers
+  class build,ci,chat,runtime aomi
+```
+
+- **Deploy path.** `aomi-build deploy` or the Build button sends your commit to
+  Aomi. Aomi builds the Rust code into a release, activates it and checks that
+  the runtime loads it.
+- **Chat path.** A caller signs in as a guest and sends a chat turn in direct
+  mode to your application id. The backend checks your Builder credit, runs the
+  model with your preamble and tools, and streams back tool events and the
+  reply.
+- **Hosting.** Each active app costs Builder credit every month. If your
+  balance goes below zero, chats to your apps return `402 builder_debt`.
+
+## The code
+
+| Path | Half | What it is |
+| --- | --- | --- |
+| `src/lib.rs` | App | Entry point. Declares the name, the preamble, the tools and the skill. |
+| `src/tools.rs` | App | `greet` and `about`. The model always sees these. |
+| `src/cafe.rs`, `src/menu.json` | App | `menu_search` and `order_total`, plus their menu data. |
+| `src/skill/cafe.md` | App | Instructions the model gets when it activates the café skill. |
+| `tests/tools.rs` | App | Tests every tool, the manifest, and which skill owns each tool. |
+| `aomi.toml` | Config | App name, display name, catalog visibility, server tags. |
+| `.aomi/config.json` | Config | Tells Build which `aomi.toml` files to deploy. |
+| `web/src/main.tsx` | Caller | A React page with `<AomiWidget>` in direct mode. |
+| `client/src/turn.ts` | Caller | Creates the client, sends a prompt in direct mode, prints tools and reply. |
+| `client/src/run.ts` | Caller | `ask`: one prompt, then exit. |
+| `client/src/tour.ts` | Caller | `tour`: the scripted three-session check. |
+
+### The app (`src/`)
+
+`dyn_aomi_app!` in `src/lib.rs` is the whole contract with Aomi. It names the
+app, gives the model its preamble, and lists the tools and skills.
+
+- **Always-on tools** go in `tools = [...]`. Here that is `greet` and `about`.
+- **Skill tools** go inside a skill. The `playground-example/cafe` skill owns
+  `menu_search` and `order_total`. The model sees them only after it activates
+  the skill. Use skills to keep the model's tool list short until it needs a
+  group of tools.
+- **Each tool** is a type that implements `DynAomiTool`, with a description, an
+  argument struct and a `run` function. Copy `Greet` in `src/tools.rs` to start
+  a new one.
+- **`BUILD`** in `src/lib.rs` is what `about` reports. Bump it on every change
+  so you can tell which build answered.
+
+Keep the `aomi-sdk = "=6.0.0"` pin in `Cargo.toml`. It must match the backend
+runtime exactly. The deploy preflight rejects any other version. The Rust build
+never touches the JS workspace.
+
+### The callers (`web/`, `client/`)
+
+Both are small examples on top of the published packages, `@aomi-labs/widget`
+and `@aomi-labs/client`. You don't need them to run your app. They show the code
+your product needs to reach it.
 
 ## When something fails
 
