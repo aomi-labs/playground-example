@@ -7,6 +7,7 @@ and the architecture come after it.
 ## Your journey
 
 ```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 28, "rankSpacing": 22}}}%%
 flowchart TB
   subgraph build["Build it · src/"]
     direction LR
@@ -22,24 +23,29 @@ flowchart TB
   end
   subgraph legend["Color key"]
     direction LR
-    kApp["Your app code<br/><small><i>src/, tests/, aomi.toml</i></small>"]
-    kAomi["Aomi Build and CLI<br/><small><i>runs on Aomi</i></small>"]
-    kCall["Your callers<br/><small><i>web/, client/</i></small>"]
-    kApp ~~~ kAomi ~~~ kCall
+    dApp((" ")) ~~~ kApp["Your app code<br/><small><i>src/, tests/, aomi.toml</i></small>"] ~~~ dAomi((" ")) ~~~ kAomi["Aomi Build and CLI<br/><small><i>runs on Aomi</i></small>"] ~~~ dCall((" ")) ~~~ kCall["Your callers<br/><small><i>web/, client/</i></small>"]
   end
   build --> ship --> use
   use ~~~ legend
 
   classDef app fill:#FAEEDA,stroke:#854F0B,color:#412402
   classDef callers fill:#FBEAF0,stroke:#993556,color:#4B1528
+  classDef dotApp fill:#BA7517,stroke:#854F0B
+  classDef dotAomi fill:#1D9E75,stroke:#0F6E56
+  classDef dotCall fill:#D4537E,stroke:#993556
+  classDef key fill:none,stroke:none,color:#444441
   classDef aomi fill:#E1F5EE,stroke:#0F6E56,color:#04342C
-  class copy,edit,test,kApp app
-  class try,tour,product,kCall callers
-  class deploy,appid,prod,kAomi aomi
+  class copy,edit,test app
+  class try,tour,product callers
+  class deploy,appid,prod aomi
   style build fill:#ffffff,stroke:#B4B2A9
   style ship fill:#ffffff,stroke:#B4B2A9
   style use fill:#ffffff,stroke:#B4B2A9
   style legend fill:#ffffff,stroke:#D3D1C7,stroke-dasharray:4 4
+  class kApp,kAomi,kCall key
+  class dApp dotApp
+  class dAomi dotAomi
+  class dCall dotCall
 ```
 
 | Step | What you do | Where |
