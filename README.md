@@ -10,15 +10,15 @@ and the architecture come after it.
 flowchart TB
   subgraph build["Build it · src/"]
     direction LR
-    copy["1 · Copy the template"] --> edit["2 · Edit tools and skill"] --> test["3 · cargo test"]
+    copy["1 · Copy the template<br/><small><i>Build or GitHub template</i></small>"] --> edit["2 · Edit tools and skill<br/><small><i>src/*.rs · aomi.toml</i></small>"] --> test["3 · cargo test<br/><small><i>tests/tools.rs</i></small>"]
   end
   subgraph ship["Ship it · Build or CLI"]
     direction LR
-    deploy["4 · Deploy"] --> appid["5 · Get the app id"]
+    deploy["4 · Deploy<br/><small><i>aomi-build deploy · Build</i></small>"] --> appid["5 · Get the app id<br/><small><i>public catalog, by release tag</i></small>"]
   end
   subgraph use["Use it · web/ and client/"]
     direction LR
-    try["6 · Try it"] --> tour["7 · Run tour"] --> product["8 · Add to your product"] --> prod["9 · Go to production"]
+    try["6 · Try it<br/><small><i>web/ page · client ask</i></small>"] --> tour["7 · Run tour<br/><small><i>client/src/tour.ts</i></small>"] --> product["8 · Add to your product<br/><small><i>main.tsx or turn.ts</i></small>"] --> prod["9 · Go to production<br/><small><i>aomi.toml server_tags</i></small>"]
   end
   build --> ship --> use
 
