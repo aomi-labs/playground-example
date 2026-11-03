@@ -10,6 +10,10 @@ export type Chat = {
   seen: number;
 };
 
+// One client for the whole process, so it signs in as a guest once and every
+// session reuses that sign-in.
+let client: Aomi | undefined;
+
 export function newChat(): Chat {
   const applicationId = Number(process.env.AOMI_APPLICATION_ID?.trim());
   if (!Number.isSafeInteger(applicationId) || applicationId <= 0) {
@@ -17,7 +21,8 @@ export function newChat(): Chat {
   }
   const baseUrl = process.env.AOMI_BASE_URL?.trim() || DEFAULT_BASE_URL;
   console.log(`host: ${new URL(baseUrl).host}  app: ${applicationId}`);
-  return { aomi: new Aomi({ baseUrl }), applicationId, seen: 0 };
+  client ??= new Aomi({ baseUrl });
+  return { aomi: client, applicationId, seen: 0 };
 }
 
 /** Send one prompt in direct mode, so this app answers instead of the Auto agent. */
