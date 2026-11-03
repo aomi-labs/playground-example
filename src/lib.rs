@@ -1,81 +1,39 @@
-//! Aomi Playground — a minimal starter app you can clone, edit, and redeploy.
+//! Aomi Playground: a starter app you can clone, edit, and redeploy.
 //!
-//! This is the source for the example agent you deployed during onboarding.
-//! Each tool is a zero-sized type implementing `DynAomiTool`; the
-//! `dyn_aomi_app!` macro at the bottom registers them and exposes the plugin to
-//! the Aomi backend. To make it yours: edit a tool, add a new one, then run
-//! `aomi-build deploy`.
+//! `greet` and `about` are always visible to the model. `menu_search` and
+//! `order_total` belong to the `playground-example/cafe` skill, so the host only
+//! exposes them after the model activates that skill. Add a tool by writing a
+//! `DynAomiTool` impl and listing it below, then run `aomi-build deploy`.
 
-use aomi_sdk::{DynAomiTool, DynToolCallCtx, dyn_aomi_app};
-use schemars::JsonSchema;
-use serde::Deserialize;
-use serde_json::{Value, json};
+mod cafe;
+mod tools;
 
-/// App state. Keep it `Clone + Default` — the runtime constructs one per
-/// session. Add fields here (HTTP clients, config) as your app grows.
+pub use cafe::{MenuSearch, OrderTotal};
+pub use tools::{About, Greet};
+
+use aomi_sdk::dyn_aomi_app;
+
+/// Bump this when you ship a change so `about` shows which build is running.
+pub const BUILD: &str = "v1";
+
+/// App state. Keep it `Clone + Default`; the runtime constructs one per session.
 #[derive(Clone, Default)]
-struct PlaygroundApp;
-
-// ---------------------------------------------------------------------------
-// Tool 1 — echo: the simplest possible tool (one required string arg).
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Deserialize, JsonSchema)]
-struct EchoArgs {
-    /// The message to echo back.
-    message: String,
-}
-
-struct EchoTool;
-
-impl DynAomiTool for EchoTool {
-    type App = PlaygroundApp;
-    type Args = EchoArgs;
-
-    const NAME: &'static str = "echo";
-    const DESCRIPTION: &'static str = "Echo a message back verbatim.";
-
-    fn run(_app: &Self::App, args: Self::Args, _ctx: DynToolCallCtx) -> Result<Value, String> {
-        Ok(json!({ "message": args.message }))
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Tool 2 — greet: shows optional args + returning structured JSON. Copy this
-// shape to build your own tools.
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Deserialize, JsonSchema)]
-struct GreetArgs {
-    /// Who to greet.
-    name: String,
-    /// Add an exclamation mark. Defaults to false.
-    #[serde(default)]
-    excited: bool,
-}
-
-struct GreetTool;
-
-impl DynAomiTool for GreetTool {
-    type App = PlaygroundApp;
-    type Args = GreetArgs;
-
-    const NAME: &'static str = "greet";
-    const DESCRIPTION: &'static str = "Greet someone by name, optionally with excitement.";
-
-    fn run(_app: &Self::App, args: Self::Args, _ctx: DynToolCallCtx) -> Result<Value, String> {
-        let punct = if args.excited { "!" } else { "." };
-        Ok(json!({ "greeting": format!("Hello, {}{}", args.name, punct) }))
-    }
-}
+pub struct Playground;
 
 dyn_aomi_app!(
-    app = PlaygroundApp,
+    app = Playground,
     name = "playground-example",
-    version = "0.1.0",
-    preamble = "You are the Aomi Playground example agent. You can echo messages \
-                and greet people. Encourage the user to clone this repo, edit \
-                `src/lib.rs`, and redeploy with `aomi-build` to make it their own.",
-    tools = [EchoTool, GreetTool],
-    namespaces = []
+    version = "0.2.0",
+    preamble = "You are the Aomi Playground agent. Greet people with greet. Use about when asked \
+                which build is running. For anything about the Space Café menu or an order, \
+                activate the playground-example/cafe skill first.",
+    tools = [Greet, About],
+    namespaces = [],
+    skills = [{
+        id: "playground-example/cafe",
+        description: "Browse the Space Café menu and price an order",
+        tags: ["menu", "order"],
+        tools: [MenuSearch, OrderTotal],
+        sections: { instructions: "skill/cafe.md" },
+    }],
 );

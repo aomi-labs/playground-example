@@ -1,0 +1,48 @@
+import { Aomi, type Event, type Session } from "@aomi-labs/client";
+
+// The client has no default host; this is the same one the widget defaults to.
+const DEFAULT_BASE_URL = "https://chat.aomi.dev";
+
+export type Chat = {
+  aomi: Aomi;
+  applicationId: number;
+  session?: Session;
+  seen: number;
+};
+
+export function newChat(): Chat {
+  const applicationId = Number(process.env.AOMI_APPLICATION_ID?.trim());
+  if (!Number.isSafeInteger(applicationId) || applicationId <= 0) {
+    throw new Error("Set AOMI_APPLICATION_ID in client/.env (see .env.example).");
+  }
+  const baseUrl = process.env.AOMI_BASE_URL?.trim() || DEFAULT_BASE_URL;
+  console.log(`host: ${new URL(baseUrl).host}  app: ${applicationId}`);
+  return { aomi: new Aomi({ baseUrl }), applicationId, seen: 0 };
+}
+
+/** Send one prompt in direct mode, so this app answers instead of the Auto agent. */
+export async function ask(chat: Chat, prompt: string) {
+  console.log(`\n> ${prompt}`);
+  const run = chat.aomi.agent.run(prompt, {
+    sessionId: chat.session?.sessionId,
+    target: { mode: "direct", applicationId: chat.applicationId },
+  });
+  const result = await run;
+  chat.session = run.session;
+
+  // Tool results arrive as `tool_complete` events; show the ones from this turn.
+  const events: readonly Event[] = run.session.getSnapshot().events;
+  for (const event of events.slice(chat.seen)) {
+    if (event.type === "tool_complete") {
+      console.log(`  tool ${event.tool_name} -> ${JSON.stringify(event.result)}`);
+    }
+  }
+  chat.seen = events.length;
+
+  const reply = result.messages.filter((m) => m.sender === "agent").at(-1);
+  console.log(reply?.content ?? "(no reply)");
+}
+
+export function endChat(chat: Chat) {
+  chat.session?.close();
+}

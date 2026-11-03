@@ -1,2 +1,7 @@
 /target
 /.aomi/deployment.json
+node_modules
+dist
+.env
+.env.local
+*.tsbuildinfo
