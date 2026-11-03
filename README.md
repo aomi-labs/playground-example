@@ -206,5 +206,5 @@ table, the deploy isn't working as expected.
 | `402 builder_debt` | Your Builder credit balance is below zero. Every chat to your apps stops, guests included. | Add credit in Build |
 | `429` on guest sign-in | The chat host limits guest sign-ins per IP | Wait for the `retry-after` time, then rerun |
 | `403 forbidden` from the client | The application id is wrong or not yours | Look the id up again in the catalog |
-| The Auto agent answers, not your app | The caller isn't in direct mode | Keep the `direct` target in `turn.ts` and `main.tsx` |
+| Replies come from the Auto agent | The caller isn't in direct mode | Keep the `direct` target in `turn.ts` and `main.tsx` |
 | The café tools never run | The skill wasn't activated, or you are testing locally | Test on a deployed app and ask about the menu |
