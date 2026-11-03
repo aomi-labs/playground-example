@@ -35,10 +35,14 @@ export async function ask(chat: Chat, prompt: string) {
   const result = await run;
   chat.session = run.session;
 
-  // Tool results arrive as `tool_complete` events; show the ones from this turn.
+  // A tool call comes back as a `message` event that carries `tool_name` and
+  // `tool_result`. Async tools finish later with a `tool_complete` event.
   const events: readonly Event[] = run.session.getSnapshot().events;
   for (const event of events.slice(chat.seen)) {
-    if (event.type === "tool_complete") {
+    if (event.type === "message" && event.tool_name) {
+      const args = JSON.stringify(event.tool_arguments ?? {});
+      console.log(`  tool ${event.tool_name} ${args} -> ${event.tool_result?.[1] ?? ""}`);
+    } else if (event.type === "tool_complete") {
       console.log(`  tool ${event.tool_name} -> ${JSON.stringify(event.result)}`);
     }
   }
