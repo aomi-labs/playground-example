@@ -272,7 +272,7 @@ app, gives the model its preamble, and lists the tools and skills.
 - **`BUILD`** in `src/lib.rs` is what `about` reports. Bump it on every change
   so you can tell which build answered.
 
-Keep the `aomi-sdk = "=6.0.0"` pin in `Cargo.toml`. It must match the backend
+Keep the `aomi-sdk = "=7.0.0"` pin in `Cargo.toml`. It must match the backend
 runtime exactly. The deploy preflight rejects any other version. The Rust build
 never touches the JS workspace.
 
@@ -286,7 +286,7 @@ your product needs to reach it.
 
 | You see | What it means | What to do |
 | --- | --- | --- |
-| Preflight rejects the SDK version | `Cargo.toml` doesn't pin `aomi-sdk = "=6.0.0"` | Restore the exact pin |
+| Preflight rejects the SDK version | `Cargo.toml` doesn't pin `aomi-sdk = "=7.0.0"` | Restore the exact pin |
 | `402 builder_debt` | Your Builder credit balance is below zero. Every chat to your apps stops, guests included. | Add credit in Build |
 | `429` on guest sign-in | The chat host limits guest sign-ins per IP | Wait for the `retry-after` time, then rerun |
 | `403 forbidden` from the client | The application id is wrong or not yours | Look the id up again in the catalog |
